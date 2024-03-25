@@ -5,113 +5,123 @@
  * @format
  */
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
+  Button,
+  Image,
+  Platform,
   SafeAreaView,
-  ScrollView,
-  StatusBar,
   StyleSheet,
-  Text,
-  useColorScheme,
   View,
 } from 'react-native';
-
 import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+  Camera,
+  useCameraDevice,
+  useCameraFormat,
+  useCameraPermission,
+} from 'react-native-vision-camera';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
+const RATIO = 0.625;
 
 function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+  const camera = useRef<Camera>(null);
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+  const [cameraPosition, setCameraPosition] = useState<'back' | 'front'>(
+    'back',
+  );
+
+  const {hasPermission, requestPermission} = useCameraPermission();
+
+  useEffect(() => {
+    if (!hasPermission) {
+      requestPermission();
+    }
+  }, [hasPermission, requestPermission]);
+
+  const device = useCameraDevice(cameraPosition);
+
+  const [picture, setPicture] = useState<string | undefined>();
+
+  const takePhoto = useCallback(async () => {
+    if (!camera.current) {
+      return;
+    }
+    const photo = await camera.current?.takePhoto({
+      flash: 'off',
+      enableShutterSound: false,
+    });
+
+    console.log(photo?.path);
+
+    setPicture(photo?.path);
+  }, []);
+
+  const format = useCameraFormat(device, [
+    {
+      photoAspectRatio: RATIO,
+      videoAspectRatio: RATIO,
+    },
+  ]);
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+    <SafeAreaView style={styles.backgroundStyle}>
+      {hasPermission ? (
+        <View style={styles.sectionsContainer}>
+          <View style={styles.section}>
+            {device && (
+              <Camera
+                style={{flex: 1}}
+                device={device}
+                format={Platform.OS === 'android' ? format : undefined}
+                enableZoomGesture
+                photo
+                ref={camera}
+                orientation="portrait"
+                exposure={0}
+                photoQualityBalance={
+                  Platform.OS === 'android' ? 'speed' : 'balanced'
+                }
+                isActive
+              />
+            )}
+          </View>
+          <View style={styles.section}>
+            {picture && (
+              <Image style={{flex: 1}} source={{uri: `file://${picture}`}} />
+            )}
+          </View>
         </View>
-      </ScrollView>
+      ) : null}
+
+      <View>
+        <Button title="Take Photo" onPress={takePhoto} />
+        <Button
+          title="Switch Camera"
+          onPress={() =>
+            setCameraPosition(prev => (prev === 'back' ? 'front' : 'back'))
+          }
+        />
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  backgroundStyle: {
+    paddingHorizontal: 10,
+    marginHorizontal: 'auto',
+    gap: 10,
+    flex: 1,
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+  sectionsContainer: {
+    flexDirection: 'row',
+    flex: 1,
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
+  section: {
+    flex: 1,
+    aspectRatio: RATIO,
+    backgroundColor: 'black',
+    borderRadius: 10,
   },
 });
 
