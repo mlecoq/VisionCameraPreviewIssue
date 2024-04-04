@@ -12,7 +12,8 @@
   "dependencies": {
     "react": "18.2.0",
     "react-native": "0.73.6",
-    "react-native-vision-camera": "^4.0.0-beta.10"
+    "react-native-static-safe-area-insets": "^2.2.0",
+    "react-native-vision-camera": "^4.0.0-beta.13"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

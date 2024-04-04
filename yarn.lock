@@ -5545,10 +5545,15 @@ react-is@^17.0.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.2.tgz#e691d4a8e9c789365655539ab372762b0efb54f0"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
-react-native-vision-camera@^4.0.0-beta.10:
-  version "4.0.0-beta.10"
-  resolved "https://registry.yarnpkg.com/react-native-vision-camera/-/react-native-vision-camera-4.0.0-beta.10.tgz#4f6564a8355a809d2dc9789fc5ebee5cf8f7e21d"
-  integrity sha512-PLXaFuBUmxeNCsFpzLmApj7OkcQ0vzJCVAEDCgNI8HQ7NSCuPnGyiUU8UHdtfPpXmILQjn+u5gnte99+a/qtKw==
+react-native-static-safe-area-insets@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/react-native-static-safe-area-insets/-/react-native-static-safe-area-insets-2.2.0.tgz#dd86b6a38f43964fac8df8c0e6bc8e062527786c"
+  integrity sha512-TLTW2e2kRK3COSK8gMZzwp4wHguFCtcO18itDLn5av/xQblXt9ylu84o+qD9aKJCBfvtNzGOvqqTKqC5GJRZ/g==
+
+react-native-vision-camera@^4.0.0-beta.12:
+  version "4.0.0-beta.13"
+  resolved "https://registry.yarnpkg.com/react-native-vision-camera/-/react-native-vision-camera-4.0.0-beta.13.tgz#bb58ffc8d1f6ca507c54b3648b681739c1bca202"
+  integrity sha512-a5ypYsr9XsERfx2UCmL1oSMC/Irra6X0Ixv0/hCgM/2ndt/aK94A6FwONr1kA/GRyU67ekOhk8HwUfxx+hi6dQ==
 
 react-native@0.73.6:
   version "0.73.6"

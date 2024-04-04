@@ -6,22 +6,24 @@
  */
 
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {
-  Button,
-  Image,
-  Platform,
-  SafeAreaView,
-  StyleSheet,
-  View,
-} from 'react-native';
+import {Button, Image, Platform, StyleSheet, View} from 'react-native';
 import {
   Camera,
   useCameraDevice,
   useCameraFormat,
   useCameraPermission,
 } from 'react-native-vision-camera';
+import {Dimensions} from 'react-native';
+import StaticSafeAreaInsets from 'react-native-static-safe-area-insets';
 
 const RATIO = 0.625;
+
+export const SCREEN_WIDTH = Dimensions.get('window').width;
+export const SCREEN_HEIGHT = Platform.select<number>({
+  android:
+    Dimensions.get('screen').height - StaticSafeAreaInsets.safeAreaInsetsBottom,
+  ios: Dimensions.get('window').height,
+}) as number;
 
 function App(): React.JSX.Element {
   const camera = useRef<Camera>(null);
@@ -51,43 +53,51 @@ function App(): React.JSX.Element {
       enableShutterSound: false,
     });
 
-    console.log(photo?.path);
+    console.log(photo?.path, photo?.width, photo?.height);
 
     setPicture(photo?.path);
   }, []);
 
+  const screenAspectRatio = SCREEN_HEIGHT / SCREEN_WIDTH;
   const format = useCameraFormat(device, [
-    {
-      photoAspectRatio: RATIO,
-      videoAspectRatio: RATIO,
-    },
+    {fps: 60},
+    {videoAspectRatio: screenAspectRatio},
+    {videoResolution: 'max'},
+    {photoAspectRatio: screenAspectRatio},
+    {photoResolution: 'max'},
   ]);
 
+  console.log(JSON.stringify(device, (k, v) => (k === 'formats' ? [] : v), 2));
+
   return (
-    <SafeAreaView style={styles.backgroundStyle}>
+    <View style={styles.backgroundStyle}>
       {hasPermission ? (
         <View style={styles.sectionsContainer}>
           <View style={styles.section}>
             {device && (
               <Camera
-                style={{flex: 1}}
+                style={StyleSheet.absoluteFill}
                 device={device}
-                format={Platform.OS === 'android' ? format : undefined}
-                enableZoomGesture
+                format={format}
+                enableZoomGesture={false}
                 photo
                 ref={camera}
                 orientation="portrait"
                 exposure={0}
-                photoQualityBalance={
-                  Platform.OS === 'android' ? 'speed' : 'balanced'
-                }
+                photoQualityBalance="quality"
+                zoom={1}
                 isActive
+                photoHdr={false}
               />
             )}
           </View>
           <View style={styles.section}>
             {picture && (
-              <Image style={{flex: 1}} source={{uri: `file://${picture}`}} />
+              <Image
+                style={StyleSheet.absoluteFill}
+                resizeMode="contain"
+                source={{uri: `file://${picture}`}}
+              />
             )}
           </View>
         </View>
@@ -102,7 +112,7 @@ function App(): React.JSX.Element {
           }
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
