@@ -6,7 +6,7 @@
  */
 
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {Button, Image, Platform, StyleSheet, View} from 'react-native';
+import {Button, Image, Platform, StyleSheet, Text, View} from 'react-native';
 import {
   Camera,
   useCameraDevice,
@@ -90,6 +90,7 @@ function App(): React.JSX.Element {
                 photoHdr={false}
               />
             )}
+            <Text style={{color: 'white'}}>PREVIEW</Text>
           </View>
           <View style={styles.section}>
             {picture && (
@@ -99,6 +100,7 @@ function App(): React.JSX.Element {
                 source={{uri: `file://${picture}`}}
               />
             )}
+            <Text style={{color: 'white'}}>CAPTURE</Text>
           </View>
         </View>
       ) : null}
@@ -132,6 +134,7 @@ const styles = StyleSheet.create({
     aspectRatio: RATIO,
     backgroundColor: 'black',
     borderRadius: 10,
+    justifyContent: 'flex-end',
   },
 });
 
